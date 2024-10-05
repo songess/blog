@@ -1,3 +1,4 @@
+'use client';
 import BlogHeader from '@/components/BlogHeader';
 import HomeMain from '@/components/HomeMain';
 

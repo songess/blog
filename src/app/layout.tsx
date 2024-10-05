@@ -1,11 +1,21 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
+import { ThemeProvider } from 'next-themes';
 
 export const metadata: Metadata = {
-  title: "블로그 만들기",
-  description: "블로그 만들기",
+  title: 'My Blog',
+  description: 'Welcome to my blog!',
   icons: {
     icon: '/png/beulping.png',
+  },
+  openGraph: {
+    title: 'Blog',
+    images: [
+      {
+        url: '/png/beulping.png',
+      },
+    ],
+    type: 'website',
   },
 };
 
@@ -15,10 +25,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="kr">
-      <body
-      >
-        {children}
+    <html lang="kr" suppressHydrationWarning>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
