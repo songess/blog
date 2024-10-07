@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from 'next-themes';
+import BlogHeader from '@/components/all/BlogHeader';
 
 export const metadata: Metadata = {
   title: 'My Blog',
@@ -26,8 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="kr" suppressHydrationWarning>
-      <body>
+      <body className='pt-[70px]'>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <BlogHeader />
           {children}
         </ThemeProvider>
       </body>
