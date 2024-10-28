@@ -27,7 +27,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="kr" suppressHydrationWarning>
-      <body className='pt-[70px]'>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap"
+        />
+      </head>
+      <body className="pt-[70px]">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <BlogHeader />
           {children}

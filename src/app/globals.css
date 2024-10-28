@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @font-face {
+  font-family: 'Inconsolata';
+  src: url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap');
+} */
+
 @font-face {
   font-family: 'Pretendard Variable';
   src: url('../styles/fonts/PretendardVariable.woff2') format('woff2');
@@ -40,9 +45,9 @@
   padding: 0;
   box-sizing: border-box;
   font-family: Pretendard, 'Pretendard Variable', -apple-system,
-    BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI',
-    'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    BlinkMacSystemFont, 'Inconsolata', system-ui, Roboto, 'Helvetica Neue',
+    'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic',
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
 }
 
 body {
@@ -205,6 +210,26 @@ body {
 pre {
   border-radius: 0.5rem;
   padding: 1rem;
+  margin: 8px 0;
+}
+
+.codeBlock {
+  font-family: 'Inconsolata' !important;
+}
+
+.codeBlock code[data-line-numbers] {
+  counter-reset: line;
+}
+
+.codeBlock code[data-line-numbers] > span[data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+
+  display: inline-block;
+  width: 0.75rem;
+  margin-right: 1.25rem;
+  text-align: right;
+  color: gray;
 }
 
 h1,

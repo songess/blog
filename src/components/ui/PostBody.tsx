@@ -5,9 +5,23 @@ interface Props {
   contentData: string;
 }
 
+/** TODO
+ * 코드블럭 테마 추가하기 (다크모드일 때 자동으로 바뀌게,, 하고싶당)
+ */
+// const prettyCodeOptions: any = {
+//   theme: {
+//     dark: JSON.parse(
+//       readFileSync('./code_theme/one-dark-pro-darker.json', 'utf-8')
+//     ),
+//     light: JSON.parse(
+//       readFileSync('./code_theme/atom-one-light.json', 'utf-8')
+//     ),
+//   },
+// };
+
 function PostBody({ contentData }: Props) {
   return (
-    <div>
+    <div className="codeBlock ">
       <MDXRemote
         source={contentData}
         options={{
