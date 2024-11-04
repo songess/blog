@@ -49,7 +49,7 @@ export default function Page() {
               </CardContent>
               <CardFooter className="flex flex-col items-start p-4">
                 <time className="text-sm text-muted-foreground mb-2">
-                  {post.date}
+                  {String(post.date)}
                 </time>
                 <h3 className="font-semibold">{post.title}</h3>
               </CardFooter>

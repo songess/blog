@@ -8,21 +8,23 @@ interface PostMatter {
   title: string;
   date: Date;
   dateString: string;
-  thumbnail: string;
-  desc: string;
+  image: string;
+  excerpt: string;
+  id: string;
+  category: 'All' | '운영체제' | 'FE' | 'CS' | '일상';
 }
 
-interface Post extends PostMatter {
+export interface Post extends PostMatter {
   content: string;
 }
 
-const BASE_PATH = 'public/posts';
+const BASE_PATH = 'public/articles';
 const POSTS_PATH = path.join(process.cwd(), BASE_PATH);
 
-
 // 포스트의 메타데이터 파싱
+// date를 dateString으로 변환
 export const parsePostDetail = async (postPath: string) => {
-  const file = readFileSync(`${BASE_PATH}/${postPath}`, 'utf8');
+  const file = readFileSync(`${postPath}`, 'utf8');
   const { data, content } = matter(file);
   const grayMatter = data as PostMatter;
   const dateString = dayjs(grayMatter.date)
@@ -31,22 +33,40 @@ export const parsePostDetail = async (postPath: string) => {
   return { ...grayMatter, dateString, content };
 };
 
-const parsePost = async (postPath: string): Promise<Post> => {
+// 포스트에 대한 메타데이터 요청함수
+export const parsePost = async (postPath: string): Promise<Post> => {
   const postDetail = await parsePostDetail(postPath);
-  console.log(postDetail);
+  // console.log(postDetail);
   return {
     ...postDetail,
   };
 };
 
+// 포스트 경로를 가져오는 함수, category의 폴더를 반환해야 한다.
 export const getPostPaths = (category?: string) => {
   const folder = category || '**';
-  const postPaths: string[] = sync(`${POSTS_PATH}/${folder}/**/*.mdx`);
+  const postPaths: string[] = sync(`${POSTS_PATH}/${folder}/*.mdx`);
   return postPaths;
 };
 
-export const getPostList = async (category?: string): Promise<Post[]> => {
+// 포스트 리스트를 가져오는 함수
+const getPostList = async (category?: string): Promise<Post[]> => {
   const postPaths = getPostPaths(category);
-  const postList = await Promise.all(postPaths.map((postPath) => parsePost(postPath)));
+  // console.log('postPaths', postPaths);
+  const postList = await Promise.all(
+    postPaths.map((postPath) => parsePost(postPath))
+  );
   return postList;
+};
+
+// post를 날짜 최신순으로 정렬
+const sortPostList = (PostList: Post[]) => {
+  return PostList.sort((a, b) => (a.date > b.date ? -1 : 1));
+};
+
+// 정렬된 포스트 리스트 반환함수
+export const getSortedPostList = async (category?: string): Promise<Post[]> => {
+  const postList = await getPostList(category);
+  // console.log('postlist', postList);
+  return sortPostList(postList);
 };
