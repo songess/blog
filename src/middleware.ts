@@ -6,6 +6,8 @@ export function middleware(req: NextRequest) {
   if (path === '/blog') {
     const reqHeaders = new Headers(req.headers);
     const category = req.nextUrl.searchParams.get('category') || '';
+    const search = req.nextUrl.searchParams.get('search') || '';
+    const encodedSearch = encodeURIComponent(search);
     const encodedCategory = encodeURIComponent(category);
     const res = NextResponse.next({
       request: {
@@ -13,6 +15,7 @@ export function middleware(req: NextRequest) {
       },
     });
     res.headers.set('x-query-category', encodedCategory);
+    res.headers.set('x-query-search', encodedSearch);
     return res;
   }
 

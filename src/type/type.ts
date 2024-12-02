@@ -4,8 +4,6 @@ import { CATEGORY_ARR } from '@/constant/category';
 export type CategoryType = (typeof CATEGORY_ARR)[number];
 
 // 블로그 포스트 타입 정의
-export type tempPost = {
-  id: string;
 export interface PostMatter {
   title: string;
   date: Date;
