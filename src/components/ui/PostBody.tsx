@@ -21,7 +21,7 @@ interface Props {
 
 function PostBody({ contentData }: Props) {
   return (
-    <div className="codeBlock ">
+    <main className="codeBlock ">
       <MDXRemote
         source={contentData}
         options={{
@@ -30,7 +30,7 @@ function PostBody({ contentData }: Props) {
           },
         }}
       />
-    </div>
+    </main>
   );
 }
 

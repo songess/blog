@@ -1,21 +1,18 @@
 import CategoryTag from '@/components/all/CategoryTag';
+import PostIndex from '@/components/all/PostIndex';
 import PostBody from '@/components/ui/PostBody';
 import { BASE_POSTS_PATH } from '@/constant/path';
-import { getSortedPostList, parsePost } from '@/lib/parsingPost';
+import { parsePost } from '@/lib/parsingPost';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import React from 'react';
 
 export default async function Page({ params }: { params: { id: string } }) {
-  console.log('params', params);
-
   const BASE_PATH = BASE_POSTS_PATH;
   const p = await parsePost(`${BASE_PATH}/${params.id}.mdx`);
-  const c = await getSortedPostList();
-  console.log(p, c);
 
   return (
-    <div className="px-5">
+    <div className="px-5 container mx-auto">
       <Image
         src={p.image}
         alt={`${p.title} 썸네일 이미지`}
@@ -31,6 +28,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         </p>
       </div>
       <hr className="py-2" />
+      <PostIndex />
       <PostBody contentData={p.content} />
     </div>
   );
