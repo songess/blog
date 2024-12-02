@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Post } from '@/lib/parsingPost';
+import { Post } from '@/type/type';
 import { CATEGORY_ARR } from '@/constant/category';
 import { CategoryType } from '@/type/type';
 

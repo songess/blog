@@ -71,7 +71,7 @@ export default function BlogHeader() {
               <li>
                 <Button
                   className={
-                    pathname === '/blog'
+                    pathname === '/blog' || pathname.startsWith('/post')
                       ? 'font-bold text-base'
                       : 'font-medium text-base'
                   }
@@ -83,7 +83,7 @@ export default function BlogHeader() {
               <li>
                 <Button
                   className={
-                    pathname === '/snippets'
+                    pathname.startsWith('/snippets')
                       ? 'font-bold text-base'
                       : 'font-medium text-base'
                   }

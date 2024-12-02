@@ -3,21 +3,7 @@ import { readFileSync } from 'fs';
 import matter from 'gray-matter';
 import path from 'path';
 import { sync } from 'glob';
-import { CategoryType } from '@/type/type';
-
-interface PostMatter {
-  title: string;
-  date: Date;
-  dateString: string;
-  image: string;
-  excerpt: string;
-  id: string;
-  category: CategoryType;
-}
-
-export interface Post extends PostMatter {
-  content: string;
-}
+import { Post, PostMatter } from '@/type/type';
 
 const BASE_PATH = 'public/articles';
 const POSTS_PATH = path.join(process.cwd(), BASE_PATH);
