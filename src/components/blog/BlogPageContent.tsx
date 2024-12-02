@@ -1,40 +1,42 @@
 'use client';
 
-import { useState } from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Post } from '@/lib/parsingPost';
+import { CATEGORY_ARR } from '@/constant/category';
+import { CategoryType } from '@/type/type';
 
-export default function BlogPageContent({ posts }: { posts: Post[] }) {
+interface Props {
+  posts: Post[];
+  category: CategoryType;
+}
+
+export default function BlogPageContent({ posts, category }: Props) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<string>('All');
-
-  const filteredPosts =
-    activeTab === 'All'
-      ? posts
-      : posts.filter((post) => post.category === activeTab);
-
   return (
     <div className="container mx-auto pb-8 px-4">
       <Tabs
-        defaultValue="All"
+        defaultValue={category}
         className="mb-8 w-fit"
-        onValueChange={setActiveTab}
+        onValueChange={(value) => {
+          window.location.href = `/blog?category=${value || '전체'}`;
+        }}
+        value={category}
       >
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="All">전체</TabsTrigger>
-          <TabsTrigger value="운영체제">운영체제</TabsTrigger>
-          <TabsTrigger value="FE">FE</TabsTrigger>
-          <TabsTrigger value="CS">CS</TabsTrigger>
-          <TabsTrigger value="일상">일상</TabsTrigger>
+          {CATEGORY_ARR.map((value) => (
+            <TabsTrigger key={value} value={value}>
+              {value}
+            </TabsTrigger>
+          ))}
         </TabsList>
       </Tabs>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {filteredPosts.map((post, index) => (
+        {posts.map((post, index) => (
           <Card
             key={index}
             className="cursor-pointer"
@@ -65,7 +67,7 @@ export default function BlogPageContent({ posts }: { posts: Post[] }) {
         ))}
       </div>
 
-      {filteredPosts.length === 0 && (
+      {posts.length === 0 && (
         <p className="text-center text-muted-foreground mt-8">
           이 카테고리에는 아직 게시물이 없습니다.
         </p>

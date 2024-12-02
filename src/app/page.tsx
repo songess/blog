@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { DUMMYposts } from '@/constant/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import dayjs from 'dayjs';
 
 export default function Page() {
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function Page() {
               </CardContent>
               <CardFooter className="flex flex-col items-start p-4">
                 <time className="text-sm text-muted-foreground mb-2">
-                  {String(post.date)}
+                  {dayjs(post.date).format('YYYY-MM-DD')}
                 </time>
                 <h3 className="font-semibold">{post.title}</h3>
               </CardFooter>

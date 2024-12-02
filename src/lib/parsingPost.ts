@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import matter from 'gray-matter';
 import path from 'path';
 import { sync } from 'glob';
+import { CategoryType } from '@/type/type';
 
 interface PostMatter {
   title: string;
@@ -11,7 +12,7 @@ interface PostMatter {
   image: string;
   excerpt: string;
   id: string;
-  category: 'All' | '운영체제' | 'FE' | 'CS' | '일상';
+  category: CategoryType;
 }
 
 export interface Post extends PostMatter {

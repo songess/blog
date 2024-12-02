@@ -1,10 +1,15 @@
+import { CATEGORY_ARR } from '@/constant/category';
+
+// category type 정의
+export type CategoryType = (typeof CATEGORY_ARR)[number];
+
 // 블로그 포스트 타입 정의
 export type tempPost = {
   id: string;
   title: string;
   excerpt: string;
   date: Date;
-  category: 'All' | '운영체제' | 'FE' | 'CS' | '일상';
+  category: CategoryType;
   image: string;
 };
 
