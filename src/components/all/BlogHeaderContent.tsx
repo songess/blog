@@ -8,8 +8,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import debounce from 'lodash/debounce';
-import { searchInputAtom } from '@/store/atom';
-import { set } from 'lodash';
 
 export default function BlogHeaderContent({ search }: { search: string }) {
   const { theme, setTheme } = useTheme();
