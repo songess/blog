@@ -59,7 +59,7 @@ function PostIndex() {
       </div>
       {isView && (
         <nav
-          className={`rounded-md py-4 px-5 text-gray-300 flex flex-col gap-1`}
+          className={`rounded-md py-4 px-5 text-gray-300 flex flex-col gap-1 bg-white overflow-scroll h-[300px] justify-center`}
         >
           {tocList &&
             tocList.map((item) => (

@@ -47,7 +47,7 @@ export default function BlogPageContent({ posts, category }: Props) {
             <CardContent className="p-0">
               <div className="relative overflow-hidden h-[192px] w-full">
                 <Image
-                  src={'/png/beulping.png'}
+                  src={post.image}
                   alt="썸네일"
                   className="object-cover transform transition-transform duration-300 hover:scale-105"
                   fill

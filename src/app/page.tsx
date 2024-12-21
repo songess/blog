@@ -11,7 +11,7 @@ export default async function Page() {
   return (
     <main className="container mx-auto px-4 h-full">
       <section className="mb-16">
-        <h1 className="text-4xl font-bold mb-4">블로그 만들기 프로젝트</h1>
+        <h1 className="text-4xl font-bold mb-4">블꾸 프로젝트</h1>
         <p className="text-xl text-muted-foreground mb-4">
           안녕하세요
           <br />
@@ -33,7 +33,7 @@ export default async function Page() {
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden h-[192px] w-full">
                     <Image
-                      src={'/png/beulping.png'}
+                      src={post.image}
                       alt="썸네일"
                       className="object-cover transform transition-transform duration-300 hover:scale-105"
                       fill

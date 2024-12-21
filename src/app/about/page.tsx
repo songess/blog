@@ -45,21 +45,31 @@ export default function About() {
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row items-center md:items-start mb-8 space-y-4 md:space-y-0 md:space-x-8">
           <Image
-            src="/png/beulping.png"
+            src="/png/developer.png"
             alt="프로필 사진"
             width={200}
             height={200}
             className="rounded-full"
           />
           <div>
-            <h1 className="text-3xl font-bold mb-2">송은수</h1>
-            <p className="text-xl text-muted-foreground mb-4">
-              프론트엔드 개발자
-            </p>
+            <h1 className="text-3xl font-bold mb-2">블꾸</h1>
+            <p className="text-xl text-muted-foreground mb-4">FE Developer</p>
             <p className="text-lg mb-4">
-              안녕하세요! 저는 사용자 경험을 중시하는 프론트엔드 개발자입니다.
-              복잡한 문제를 해결하고 아름다운 인터페이스를 만드는 것을
-              좋아합니다.
+              더 나은 사용자 경험을 제공하기 위해 노력합니다.
+              <br />
+              <br />한 화면에서 여러 개의 화면이 공존할 수 있도록 바텀시트를
+              도입했 습니다. 빠른 반응성을 제공하기 위해 낙관적 업데이트를
+              적용했고 소셜 로그인을 도입해 회원가입의 부담을 덜었습니 다. 제가
+              불편함을 느꼈던 점은 다른 사람들도 비슷하게 느낄 것이라
+              생각했습니다. 코로나 이후 사람들과의 만남이 어려 운 상황을
+              해결하고자, 함께 식사할 사람을 연결해주는 매칭 서비스를
+              만들었습니다.
+              <br />
+              <br />
+              협업을 중요하게 생각합니다. 개발자, 디자이너, 기획자들과 원활히
+              소통하며 방향성을 명확히 설정한 후 프로젝트를 진행합니다. 또한,
+              커밋과 PR을 통해 작업 과정을 기록하고 공유하는 것을 생활화하고
+              있습니다.
             </p>
           </div>
         </div>

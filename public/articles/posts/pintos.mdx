@@ -1,0 +1,204 @@
+---
+title: 핀토스 프로젝트 시작
+date: 2024-09-23
+excerpt: prj1
+image: /png/pintos.png
+id: pintos
+category: 운영체제
+---
+
+## 프로젝트 시작
+
+내가 커맨드를 입력하면 운영체제는 이를 읽고 올바른 프로그램을 실행해야 한다. 현재 제공되어진 `pintos skeleton`은 운영체제가 제대로 구성되어있지 않아 올바른 실행이 불가능하다.
+
+`echo x`를 입력했을 때 올바른 `echo`가 실행되어 `x`가 실행되기 위해선 운영체제가 `echo`를 제대로 인식해야 한다. 이를 위해 우리가 무엇을 해야하는지 살펴보자.
+
+커맨드로부터 입력을 받는다면 이를 유저스택에 쌓고, 커널에게 시스템 콜로 요청할때 이 스택을 커널이 확인한다. 지금은 커맨드가 들어오면 문장자체를 명령어로 인식하고 있기 때문에 이를 구분해주어야 한다.
+
+프로그램이 실행되는 순서를 살펴보자. `threads/init.c`의 `main()`을 통해 `run_actions()`함수가 실행된다. `run`옵션이 주어져 있으면 `run_task()`를 실행한다. 그럼 함수에서는 `process_execute()`을 통해 주어진 명령어를 실행하는 유저 프로세스(스레드)를 생성한다. 그리고 이는 `process_wait()`을 통해 유저 프로세스가 끝날 때까지 종료를 기다리게 되는데 초기에 이는 미구현 되어있다.
+
+유저 프로세스는 `process_execute()`의 `thread_create`에서 `start_process()`를 통해 생성되며 내부에서 `load()`를 통해 메모리에 프로그램을 올린다. 함수에선 `setup_stack()`을 호출하여 유저스택을 초기화 한다. 그럼 이제 유저스택을 쌓는 것을 구현하면 인자를 정상적으로 전달할 수 있다.
+
+## argument passing 구현기
+
+
+구현을 하고 보면 다음과 같이 뜨는 것을 확인할 수 있다. 처음에는 제대로 짠 코드라고 생각했다. 하지만 `PHYS-BASE` 가 뭔지 찾아보면서 무언가 잘못되었음을 깨달았다. `PHTS_BASE` 는 stack의 탑 부분이라고 한다(아마 유저 영역을 말하는 거 같다). 그래서 일반적으로 `0xc0000000` 이 되고, 이는 곧 커널 가상메모리의 시작점이라고 한다. 즉 `c0000000` 이후는 커널 영역이라는 소리다. 그럼 커널 자체도 프로세스이기 때문에 메모리에 적재되어 있을 거고, `S...S........S...` 이 부분은 커널 영역이란 소리다. `bffffff0` 이 부분이 내가 스택을 만든 곳이라는 소린데 아무것도 적재되어 있지 않다. 코드에서 잘못된 부분을 찾아 고치니 정상적으로 스택이 쌓이는 것을 확인할 수 있었다.
+
+
+이제 패스를 위해 `system call!`을 역추적해본다.
+
+_역참조는 포인터를 통해 메모리 주소에 저장된 값을 접근할 때 발생한다._
+_p가 포인터 p가 가리키는 실제 값에 접근하는 과정이 역참조입니다._
+
+## User Memory Access
+
+그 전에 유저가 올바른 접근을 했는지 확인한다. 잘못된 경우로는
+
+1. null을 입력
+2. 매핑되지 않은 가상공간 접근
+3. 커널 영역을 침범
+
+이 있을 수 있다.
+
+```c
+void check_userValidAccess(void* addr){
+  if(addr == NULL) exit(-1);
+  if(!is_user_vaddr(addr)) exit(-1);
+  if(!pagedir_get_page(thread_current()->pagedir,addr)) exit(-1);
+}
+```
+
+```cpp
+/* A kernel thread or user process.
+
+   Each thread structure is stored in its own 4 kB page.  The
+   thread structure itself sits at the very bottom of the page
+   (at offset 0).  The rest of the page is reserved for the
+   thread's kernel stack, which grows downward from the top of
+   the page (at offset 4 kB).  Here's an illustration:
+
+        4 kB +---------------------------------+
+             |          kernel stack           |
+             |                |                |
+             |                |                |
+             |                V                |
+             |         grows downward          |
+             |                                 |
+             |                                 |
+             |                                 |
+             |                                 |
+             |                                 |
+             |                                 |
+             |                                 |
+             |                                 |
+             +---------------------------------+
+             |              magic              |
+             |                :                |
+             |                :                |
+             |               name              |
+             |              status             |
+        0 kB +---------------------------------+
+
+   The upshot of this is twofold:
+
+      1. First, `struct thread' must not be allowed to grow too
+         big.  If it does, then there will not be enough room for
+         the kernel stack.  Our base `struct thread' is only a
+         few bytes in size.  It probably should stay well under 1
+         kB.
+
+      2. Second, kernel stacks must not be allowed to grow too
+         large.  If a stack overflows, it will corrupt the thread
+         state.  Thus, kernel functions should not allocate large
+         structures or arrays as non-static local variables.  Use
+         dynamic allocation with malloc() or palloc_get_page()
+         instead.
+
+   The first symptom of either of these problems will probably be
+   an assertion failure in thread_current(), which checks that
+   the `magic' member of the running thread's `struct thread' is
+   set to THREAD_MAGIC.  Stack overflow will normally change this
+   value, triggering the assertion. */
+/* The `elem' member has a dual purpose.  It can be an element in
+   the run queue (thread.c), or it can be an element in a
+   semaphore wait list (synch.c).  It can be used these two ways
+   only because they are mutually exclusive: only a thread in the
+   ready state is on the run queue, whereas only a thread in the
+   blocked state is on a semaphore wait list. */
+```
+
+여기서 페이지는 실행되고 있는 하나의 스레드를 의미한다.
+
+## syscall
+
+이제 커널에 접근하여 `syscall` 을 통해 `syscall handler` 를 실행해보자. 프로세스가 작동하다 인터럽트/트랩 등의 발생으로 `syscall` 이 호출된다. 그러면 넘버, 인자 등을 담아서 `syscall handler` 를 호출한다. 그럼 여기서 번호에 따라 알맞은 `syscall` 을 호출하면 되는데 현재 핀토스는 이 설정이 되어있지 않다.
+
+```c
+static void
+syscall_handler (struct intr_frame *f UNUSED)
+{
+  switch(*(int32_t*)(f->esp)){
+    case SYS_HALT:                   /* Halt the operating system. */
+    break;
+    case SYS_EXIT:                   /* Terminate this process. */
+    break;
+    case SYS_EXEC:                   /* Start another process. */
+    break;
+    case SYS_WAIT:                   /* Wait for a child process to die. */
+    break;
+    case SYS_READ:                   /* Read from a file. */
+    break;
+    case SYS_WRITE:                  /* Write to a file. */
+    break;
+  }
+  thread_exit ();
+}
+```
+
+작성해야 하는 6개의 `syscall` 을 먼저 호출했다.
+
+```tsx
+/* f 자체가 intr_frame의 포인터이고,
+이는 구조체의 주소임으로 integer의 포인터로 변환하고 dereference 한다. */
+switch(*(int32_t*)(f->esp)){
+
+```
+
+`exit()` 은 종료상태(`int status` )를 인자로 받는다. 이를 저장해 커널에 반환해야 하는데 현재 이 상태를 저장하는 곳이 없다. `thread` 구조체 내에 `exit_status` 를 선언해 이를 저장해준다.
+
+```tsx
+// src/threads/thread.h 의 thread 구조체 내용의 일부
+#ifdef USERPROG
+    /* Owned by userprog/process.c. */
+    uint32_t *pagedir;                  /* Page directory. */
+    int exit_status; // 추가
+
+#endif
+```
+
+현재상태로 실행하면 실행중인 스레드의 이름이 이상하게 저장된다. 앞서 있던 문제처럼 파싱이 제대로 되지 않은 문제인데, 이를 `process_execute()` 에서 넘기는 `file_name` 을 토큰화 함으로써 수정한다.
+
+```tsx
+// process.c/process_execute()
+char tempFileName[200];
+	char *nextPtr;
+
+strlcpy(tempFileName,file_name,strlen(file_name)+1);
+  char *tmp = strtok_r(tempFileName," ",&nextPtr);
+
+  /* Create a new thread to execute FILE_NAME. */
+  tid = thread_create (tmp, PRI_DEFAULT, start_process, fn_copy);
+```
+
+`exception.c` 에서
+
+```
+if (is_kernel_vaddr(fault_addr) || !user) {
+    exit_(-1);
+  }
+```
+
+를 추가해 커널모드에서 접근 혹은 유저모드에서 접근하면 종료시킨다.
+
+`process.c/process_execute()` 에서
+
+```tsx
+if (!filesys_open(tmp)) return -1;
+```
+
+를 추가해줬다. 제대로된 입력이 되지 않았을때 종료시키는 구문이다.
+
+`syscall.h` 에서 함수들을 작성해준 후 추가적으로 동기화를 처리해줄 필요가 있었다. 기본으로 되어있는 핀토스는 부모프로세스가 자식 프로세스의 실행을 기다리지 않기 때문에 지금까지는 `process_wait()` 에 `sleep()` 을 걸어 확인하고 있었다. 그 이유는 `wait()` 이 똑바로 처리되지 않았기 때문이기에 이를 처리하기 위한 `sephamore` 를 도입했다. 또한 현재 실행중인 프로세스를 확인하기 위한 스레드 리스트도 생성했다.
+
+메모리, 자식용 `sem` 을 만들어 0으로 만들어 준다. 그리고 `process_exit()` 에서 프로세스가 끝날때 자식용 `sem` 을 1로 만들어 준다. 그럼 `process_wait()` 이 이를 가져가고 돌아가던 프로세스가 죽었음을 확인한 후 요청을 받은 자식 프로세스를 실행한다. 종료상태를 집어넣고, 메모리에서 제거해준 후 메모리용 `sem` 을 올려(`process_exit()`에서 메모리용`sem`은 0이였기 때문에 완료된 자식프로세스의 메모리 초기화를 기다리고 있다.) 다음 프로세스 요청을 받을 수 있게 해준다.
+
+## additional
+
+이걸하면서 syscall 호출을 이해한거 같기도.. `examples` 에서 syscall을 호출할 수 있는 함수를 부르면 `lib/syscall.c` 에 있는 함수가 호출되고, 여기서 `userProg/syscall.c` 에 있는 syscall을 호출한다. 그럼 이 프로세스는 호출되어 실행된다.
+
+```tsx
+
+f->eax = fibonacci_(*(int*)(f->esp+4));
+```
+
+반환받아야할게 있다면 `eax` 에 매핑시켜줘야한다….
